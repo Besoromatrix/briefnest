@@ -1,69 +1,153 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase/client";
+
+export default function HomePage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function verificarSessao() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session) {
+        router.replace("/dashboard");
+        return;
+      }
+
+      setLoading(false);
+    }
+
+    verificarSessao();
+  }, [router]);
+
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#0f1117] text-white">
+        <p className="text-gray-400">Carregando BriefNest...</p>
       </main>
-    </div>
+    );
+  }
+
+  return (
+    <main className="min-h-screen bg-[#0f1117] text-white">
+      {/* HEADER */}
+      <header className="border-b border-[#252936] bg-[#11141b]">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+          <button
+            onClick={() => router.push("/")}
+            className="text-xl font-bold text-white"
+          >
+            BriefNest
+          </button>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push("/login")}
+              className="rounded-lg px-4 py-2 text-sm text-gray-300 transition hover:bg-[#181b24] hover:text-white"
+            >
+              Entrar
+            </button>
+
+            <button
+              onClick={() => router.push("/signup")}
+              className="rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-purple-500"
+            >
+              Criar conta
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* HERO */}
+      <section className="mx-auto max-w-6xl px-6 py-24">
+        <div className="max-w-3xl">
+          <div className="mb-5 inline-flex rounded-full border border-purple-500/20 bg-purple-500/10 px-3 py-1 text-sm text-purple-300">
+            Organização de comissões para artistas
+          </div>
+
+          <h1 className="text-4xl font-bold leading-tight tracking-tight sm:text-6xl">
+            Organize suas comissões sem se perder nas mensagens.
+          </h1>
+
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-gray-400">
+            O BriefNest ajuda artistas a coletarem e organizarem as
+            informações de uma comissão em um único briefing, reduzindo a
+            necessidade de procurar detalhes em conversas antigas.
+          </p>
+
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <button
+              onClick={() => router.push("/signup")}
+              className="rounded-lg bg-purple-600 px-6 py-3 font-semibold text-white transition hover:bg-purple-500"
+            >
+              Começar gratuitamente
+            </button>
+
+            <button
+              onClick={() => router.push("/login")}
+              className="rounded-lg border border-[#343a48] bg-[#181b24] px-6 py-3 font-semibold text-gray-200 transition hover:bg-[#20242e]"
+            >
+              Já tenho uma conta
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* BENEFÍCIOS */}
+      <section className="border-t border-[#252936] bg-[#11141b]">
+        <div className="mx-auto grid max-w-6xl gap-6 px-6 py-16 md:grid-cols-3">
+          <div className="rounded-2xl border border-[#292e3a] bg-[#181b24] p-6">
+            <div className="mb-4 text-2xl">📝</div>
+
+            <h2 className="text-lg font-semibold text-white">
+              Perguntas organizadas
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-gray-400">
+              Crie perguntas específicas para entender exatamente o que o
+              cliente deseja.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#292e3a] bg-[#181b24] p-6">
+            <div className="mb-4 text-2xl">📂</div>
+
+            <h2 className="text-lg font-semibold text-white">
+              Tudo em um lugar
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-gray-400">
+              Evite depender de várias mensagens espalhadas pelo WhatsApp ou
+              outras plataformas.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#292e3a] bg-[#181b24] p-6">
+            <div className="mb-4 text-2xl">🎨</div>
+
+            <h2 className="text-lg font-semibold text-white">
+              Feito para artistas
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-gray-400">
+              O produto é focado no processo de encomendas e comissões
+              artísticas.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="border-t border-[#252936]">
+        <div className="mx-auto max-w-6xl px-6 py-6 text-center text-sm text-gray-500">
+          BriefNest — organização simples para comissões artísticas.
+        </div>
+      </footer>
+    </main>
   );
 }
